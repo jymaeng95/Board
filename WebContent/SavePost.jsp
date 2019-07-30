@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=EUC-KR"
+`<%@ page language="java" contentType="text/html; charset=EUC-KR"
     pageEncoding="EUC-KR" import ="java.sql.*,board.*"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
 <title>SavePost</title>
 </head>
+
 <body>
 	<%
 		Connection con = null;
@@ -24,9 +25,9 @@
 			
 			boolean check = db.setPost(category, name, pPw, show, notice, title, contents);
 			if(check){
-				out.print("<script><alert('삽입성공')</script>");
+				out.print("<script><alert('삽입성공')></script>");
 			}else{
-				out.print("<script><alert('삽입실패')</script>");
+				out.print("<script><alert('삽입실패')></script>");
 			}						
 		}catch (Exception e){
 			System.out.print("에러");

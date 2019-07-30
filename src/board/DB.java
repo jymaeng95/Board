@@ -3,11 +3,13 @@ import java.sql.*;
 
 
 public class DB {
-	static Connection con = null;
-	static String driver = "oracle.jdbc.driver.OracleDriver";
-	static String url = "jdbc:oracle:thin:@127.0.0.1:1521:orcl";
-	static ResultSet rs = null;
-	static Boolean connect = false;
+	Connection con = null;
+	String driver = "oracle.jdbc.driver.OracleDriver";
+	String url = "jdbc:oracle:thin:@127.0.0.1:1521:orcl";
+	ResultSet rs = null;
+	Boolean connect = false;
+	Statement stmt = null;
+	PreparedStatement pstmt = null;
 	
 	//	DB 연결 
 	public Connection loadConnect(){
@@ -40,20 +42,27 @@ public class DB {
 	public ResultSet getCategory() {
 		String sql = "select *from board";
 		try {
-			Statement stmt = con.createStatement();
+			stmt = con.createStatement();
 			rs = stmt.executeQuery(sql);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			try {
+				stmt.close();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			System.out.println("쿼리 에러");
 		} 
 		return rs;
 		
 	}
-
+	
+	//게시글 저장하기 
 	public boolean setPost(String category, String name, String pPw, String show, String notice, String title, String contents) {
 		boolean check = false;
-		String sql = "insert into post values(no_seq.nextval,?,?,?,?,'',?,'',?,SYSDATE,?)";
+		String sql = "insert into post values(no_seq.nextval,?,?,?,?,0,?,0,?,SYSDATE,?)";
 		
 		try {
 			PreparedStatement pstmt = con.prepareStatement(sql);
@@ -73,9 +82,54 @@ public class DB {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			try {
+				pstmt.close();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 		return check;
+	}
 	
+	
+	//공지사항 불러오기 
+	public ResultSet loadNotice() {
+		String sql = "select pNum, title,name, hit, recommend, pdate from post where notice_YN = 'Y' order by pnum desc";
+		try {
+			stmt = con.createStatement();
+			rs = stmt.executeQuery(sql);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			try {
+				stmt.close();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		
+		return rs;
+	}
+	
+	//포스트 불러오기 
+	public ResultSet loadPost() {
+		String sql = "select show_YN, pNum, title, name, hit, recommend, pdate from post order by pnum desc";
+		try {
+			stmt = con.createStatement();
+			rs = stmt.executeQuery(sql);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			try {
+				stmt.close();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		return rs;
 	}
 }
 	
