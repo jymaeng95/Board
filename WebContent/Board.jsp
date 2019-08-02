@@ -39,7 +39,7 @@ body {
 		Connection con = null;
 		ResultSet rs = null;
 		String category = null;
-		int num;
+		int num=0;
 		
 		int i =0;
 		int count=0;
@@ -106,13 +106,14 @@ body {
 		<div>
 			<table class = "post">
 		<%
-			rs = db.loadPost();
+			rs = db.getPostHeader();
 		while(rs.next()){
 			String show = rs.getString("show_YN");
+			num = rs.getInt("pNum");
 			if(show.equals("N")){
 				%><tr align = "center">
-				<td width = "70"><%= rs.getString("pnum")%></td>
-				<td width = "600">공개되지 않은 글 입니다.</td>
+				<td width = "70"><%= num%></td>
+				<td width = "600"><a href ="Confirm_PW.jsp?flag=3&pNum=<%=num%>">공개되지 않은 글 입니다.</a></td>
 				<td width = "100"><%= rs.getString("name")%></td>
 				<td width = "70"><%= rs.getInt("hit")%></td>
 				<td width = "70"><%= rs.getInt("recommend")%></td>
@@ -122,8 +123,9 @@ body {
 			} else {
 		%>	
 			<tr align = "center">
-				<td width = "70"><%= rs.getString("pnum")%></td>
-				<td width = "600"><%= rs.getString("title")%> </td>
+				<td width = "70"><%= num%></td>
+				<td width = "600"><a href ="ShowPost.jsp?pNum=<%=num%>">
+				<%= rs.getString("title")%></a></td>
 				<td width = "100"><%= rs.getString("name")%></td>
 				<td width = "70"><%= rs.getInt("hit")%></td>
 				<td width = "70"><%= rs.getInt("recommend")%></td>
@@ -135,6 +137,10 @@ body {
 		%>	
 		</table>
 		</div>
+		<hr>
+		
+		<input type = "button" value = "글쓰기" onclick = "location.href = 'Post.jsp'">
+		
 	<% 	
 			
 		}catch (Exception e){

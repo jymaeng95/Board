@@ -59,7 +59,7 @@ body {
 	<br><hr>
 	<textarea rows="20" cols="100" name = "contents"></textarea><br><br>
 	<input type = "file" size = "70">
-	<input type = "button" value = "목록">
+	<input type = "button" value = "목록" onClick = "location.href = 'Board.jsp'">
 	<input type ="submit"  value = "확인">
 	<%	
 		} catch(Exception e) {
