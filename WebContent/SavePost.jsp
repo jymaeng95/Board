@@ -31,7 +31,7 @@
 			map.put("contents",request.getParameter("contents"));
 			if(flag == 1){
 				map.put("pNum",request.getParameter("pNum"));
-				boolean check = db.setModifyPost(con, map);
+				db.setModifyPost(con, map);
 			}else {
 				db.setPost(con,map);
 			}

@@ -19,7 +19,6 @@ body {
 				
 		flag = Integer.parseInt(request.getParameter("flag"));
 		num = Integer.parseInt(request.getParameter("pNum"));
-			
 		%>
 		<input type="hidden" value="<%=num %>" name="pNum">
 		<input type="hidden" value="<%=flag %>" name="flag"> 

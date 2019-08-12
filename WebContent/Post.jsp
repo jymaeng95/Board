@@ -42,7 +42,6 @@ body {
 		<hr>
 		<input type = "hidden" value = "<%=num %>" name = "pNum">
 		<input type = "hidden" value = "<%=flag %>" name = "flag">
-		
 		<select name = "category"> 
 			<option value =""> 게시판 이름 </option>
 			<%

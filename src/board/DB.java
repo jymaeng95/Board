@@ -180,7 +180,7 @@ public class DB {
 		ResultSet rs = null;
 		ArrayList<UserBean> list = new ArrayList<UserBean>();
 		StringBuilder sql = new StringBuilder();
-		sql.append("select name,show_YN, notice_YN, pPw, title, contents, pDate, hit ");
+		sql.append("select name,show_YN, notice_YN, pPw, title, recommend, contents, pDate, hit ");
 		sql.append("from post where pNum = ?");
 		
 		try {
@@ -194,6 +194,7 @@ public class DB {
 				bean.setNotice(rs.getString("notice_YN"));
 				bean.setPpw(rs.getString("pPw"));
 				bean.setTitle(rs.getString("title"));
+				bean.setRecommend(rs.getInt("recommend"));
 				bean.setContents(rs.getString("contents"));
 				bean.setPdate(rs.getString("pDate"));
 				bean.setHit(rs.getInt("hit"));
@@ -292,9 +293,8 @@ public class DB {
 	}
 	
 
-	public boolean setModifyPost(Connection con, Map<String, String> data) {
+	public void setModifyPost(Connection con, Map<String, String> data) {
 		PreparedStatement pstmt = null;
-		boolean check = false;
 		
 		StringBuilder sql = new StringBuilder();
 		sql.append("update post set category = ?, name = ?, pPw = ?, show_YN = ?,");
@@ -310,16 +310,13 @@ public class DB {
 			pstmt.setString(6, CommonUtil.removeNVL(data.get("title")));
 			pstmt.setString(7, CommonUtil.removeNVL(data.get("contents")));
 			pstmt.setInt(8, Integer.parseInt(data.get("pNum")));
-			
-			return pstmt.executeUpdate() > 0;
+			pstmt.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			closePstmt(pstmt);
 		}
-		
-		return check;
 	}
 	
 	//PreparedStatement, Statement Á¾·á

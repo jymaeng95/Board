@@ -59,6 +59,7 @@ body {
 		ArrayList<UserBean> list = null;
 		int num=0, nextNum = 0;
 		int count=0;
+		boolean recommend = false;
 		try{
 			list = new ArrayList<UserBean>();
 			request.setCharacterEncoding("EUC-KR");
@@ -100,7 +101,7 @@ body {
 		<!--<input type="hidden" name="pNum" value="999" /> -->
 			<input type="hidden" id="flag" name="flag" value="4" />
 			<input type="hidden" id="lineCount" name="lineCount" value="" />
-			
+			<input type="hidden" value = "<%=recommend %>" name = "recommend">
 		<div>
 			<table class = "notice">
 		<%
