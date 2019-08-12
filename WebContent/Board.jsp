@@ -1,5 +1,13 @@
+<%@page import="java.util.HashMap"%>
+<%@page import="java.util.Map"%>
+<%@page import="java.util.ArrayList" %>
 <%@ page language="java" contentType="text/html; charset=EUC-KR"
     pageEncoding="EUC-KR" import="java.sql.*,board.*"%>
+    <%
+   // String lineCount = request.getParameter("lineCount");
+    %>
+  <!--    <script>alert("<%//=lineCount %>");</script>-->
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -11,7 +19,16 @@ function count(){
 	var idx = selId.selectedIndex;
 	var count = selId.options[idx].value;
 	
-	return count;
+	document.getElementById("formPost").setAttribute("action", "Board.jsp");
+	document.getElementById("lineCount").value = count;
+	document.getElementById("formPost").submit();
+}
+
+function submit(url, pNum, flag) {
+	document.getElementById("pNum").value = pNum;
+	document.getElementById("flag").value = flag;
+	document.getElementById("formPost").setAttribute("action",url);
+	document.getElementById("formPost").submit();
 }
 
 
@@ -37,25 +54,25 @@ body {
 	<%
 		DB db = null;
 		Connection con = null;
-		ResultSet rs = null;
 		String category = null;
-		int num=0;
-		
-		int i =0;
+		ResultSet rs = null;
+		ArrayList<UserBean> list = null;
+		int num=0, nextNum = 0;
 		int count=0;
 		try{
+			list = new ArrayList<UserBean>();
+			request.setCharacterEncoding("EUC-KR");
 			db = new DB();
 			con = db.loadConnect();
-			rs = db.getCategory();
+			list = db.getCategory(con);
 	%>
 	<h3> Board</h3><hr>
 		<select id = "category"> 
 			<option value =""> 게시판 이름 </option>
 			<%
-			while(rs.next()){		//select태그에 게시판 이름 option 넣기 
-				category = rs.getString(1);
+				for(int i=0;i<list.size();i++){
 			%>
-				<option value="<%=category%>"><%= category%></option>
+				<option value="<%=list.get(i).getCategory() %>"><%=list.get(i).getCategory() %></option>
 			<%
 			}
 			%>
@@ -77,27 +94,30 @@ body {
 			</tr>
 		</table><hr>
 		
+		<form id="formPost" action="Post.jsp" method="post">
+		<% nextNum = db.getNextPnum(con); %>
+			<input type="hidden" id="pNum" name="pNum" value="<%=nextNum %>" />
+		<!--<input type="hidden" name="pNum" value="999" /> -->
+			<input type="hidden" id="flag" name="flag" value="4" />
+			<input type="hidden" id="lineCount" name="lineCount" value="" />
+			
 		<div>
 			<table class = "notice">
 		<%
-			rs = db.loadNotice();
-			while(rs.next()){
-				if(i>2){
-					break;
-				}
-				num = rs.getInt("pNum");
+			list = db.loadNotice(con);
+			for(int i=0;i<list.size();i++){
+				num = list.get(i).getPnum();
 		%>
 			<tr align = "center">
 				<td width = "70"><%= num%></td>
-				<td width = "600"><a href ="ShowPost.jsp?pNum=<%=num%>">
-				<%= rs.getString("title")%></a></td>
-				<td width = "100"><%= rs.getString("name")%></td>
-				<td width = "70"><%= rs.getInt("hit")%></td>
-				<td width = "70"><%= rs.getInt("recommend")%></td>
-				<td width = "150"><%= rs.getString("pdate")%></td>
+			
+				<td width = "600"><a href ="javascript:submit('ShowPost.jsp', '<%=num%>', '');"><%=list.get(i).getTitle() %></a></td>
+				<td width = "100"><%=list.get(i).getName()%></td>
+				<td width = "70"><%=list.get(i).getHit()%></td>
+				<td width = "70"><%=list.get(i).getRecommend()%></td>
+				<td width = "150"><%=list.get(i).getPdate()%></td>
 			</tr>
 		<%
-			i++;
 			}
 		%>
 		</table>
@@ -106,43 +126,41 @@ body {
 		<div>
 			<table class = "post">
 		<%
-			rs = db.getPostHeader();
-		while(rs.next()){
-			String show = rs.getString("show_YN");
-			num = rs.getInt("pNum");
-			if(show.equals("N")){
-				%><tr align = "center">
-				<td width = "70"><%= num%></td>
-				<td width = "600"><a href ="Confirm_PW.jsp?flag=3&pNum=<%=num%>">공개되지 않은 글 입니다.</a></td>
-				<td width = "100"><%= rs.getString("name")%></td>
-				<td width = "70"><%= rs.getInt("hit")%></td>
-				<td width = "70"><%= rs.getInt("recommend")%></td>
-				<td width = "150"><%= rs.getString("pdate")%></td>
-			</tr>
-			<% 
-			} else {
-		%>	
-			<tr align = "center">
-				<td width = "70"><%= num%></td>
-				<td width = "600"><a href ="ShowPost.jsp?pNum=<%=num%>">
-				<%= rs.getString("title")%></a></td>
-				<td width = "100"><%= rs.getString("name")%></td>
-				<td width = "70"><%= rs.getInt("hit")%></td>
-				<td width = "70"><%= rs.getInt("recommend")%></td>
-				<td width = "150"><%= rs.getString("pdate")%></td>
-			</tr>
-		<% 	
+			list = db.getPostHeader(con);
+			for(int i=0;i<list.size();i++){
+				String show = list.get(i).getShow();
+				num = list.get(i).getPnum();
+				
+				if(show.equals("N")){
+					%><tr align = "center">
+					<td width = "70"><%=num%></td>
+					<td width = "600"><a href ="javascript:submit('Confirm_PW.jsp', '<%=num%>', '3');">공개되지 않은 글 입니다.</a></td>
+					<td width = "100"><%=list.get(i).getName()%></td>
+					<td width = "70"><%=list.get(i).getHit()%></td>
+					<td width = "70"><%=list.get(i).getRecommend()%></td>
+					<td width = "150"><%=list.get(i).getPdate()%></td>
+				</tr>
+				<% 
+				} else {
+			%>	
+				<tr align = "center">
+					<td width = "70"><%= num%></td>
+					<td width = "600"><a href ="javascript:submit('ShowPost.jsp', '<%=num%>', '');"><%=list.get(i).getTitle()%></a></td>
+					<td width = "100"><%=list.get(i).getName()%></td>
+					<td width = "70"><%=list.get(i).getHit()%></td>
+					<td width = "70"><%=list.get(i).getRecommend()%></td>
+					<td width = "150"><%=list.get(i).getPdate()%></td>
+				</tr>
+			<% 	
+				}
 			}
-		}
-		%>	
-		</table>
-		</div>
-		<hr>
-		
-		<input type = "button" value = "글쓰기" onclick = "location.href = 'Post.jsp'">
+			%>	
+			</table>
+		</div><hr>
+		<input type = "submit" value = "글쓰기">
+		</form>
 		
 	<% 	
-			
 		}catch (Exception e){
 			System.out.print("에러");
 			

@@ -26,7 +26,7 @@ body {
 			request.setCharacterEncoding("EUC-KR");
 			num = Integer.parseInt(request.getParameter("pNum"));
 			
-			boolean check = db.updateRecommend(num);
+			boolean check = db.updateRecommend(con,num);
 			if(check){
 				out.print("추천하였습니다");
 			}else{

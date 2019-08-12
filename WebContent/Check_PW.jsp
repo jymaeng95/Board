@@ -15,7 +15,7 @@
 		
 		try{
 			db = new DB();
-			db.loadConnect();
+			con = db.loadConnect();
 			
 			request.setCharacterEncoding("EUC-KR");
 			
@@ -23,16 +23,17 @@
 			flag = Integer.parseInt(request.getParameter("flag"));
 			pw = request.getParameter("pPw");
 			
-			check = db.confirmPW(num, pw);
+			check = db.confirmPW(con,num,pw);
 			if(check>0){
 				switch(flag){
 				case 1:
-					%><jsp:forward page = "ModifyPost.jsp">
+					%><jsp:forward page = "Post.jsp">
+					<jsp:param name="flag" value = "<%=flag %>"/>
 					<jsp:param name="pNum" value = "<%=num %>"/>
 					</jsp:forward>
 					<% break;
 				case 2:
-					db.deletePost(num);
+					db.deletePost(con,num);
 					%><jsp:forward page = "Board.jsp"/>
 					<% break; 
 				case 3:

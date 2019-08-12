@@ -1,11 +1,36 @@
+<%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=EUC-KR"
     pageEncoding="EUC-KR" import = "java.sql.*,board.*"%>
+ 
+ <%
+ 
+ // 추천수,조회수 업데이트 코드 작성 (밑에 삭제 후)
+ //if("true".equals("추천 플래그")) {
+	 //DB 저장
+	 
+	 
+	 %>
+<!-- 	 <script>alert("추천하였습니다.");</script> -->
+	 <%
+	 
+// }
+ 
+ 
+ %> 
+   
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
 <title>Insert title here</title>
-
+<script language = "javascript">
+function submit(url, pNum, flag) {
+	document.getElementById("pNum").value = pNum;
+	document.getElementById("flag").value = flag;
+	document.getElementById("showPost").setAttribute("action",url);
+	document.getElementById("showPost").submit();
+}
+</script>
 </head>
 <style>
 hr {
@@ -27,28 +52,29 @@ body {
 	<%
 		Connection con = null;
 		DB db = null;
-		ResultSet rs = null;
 		String title="",name="",pdate="",contents="";
+		ArrayList <UserBean> list = null;
 		int num=0,hit=0;
 		try {
 			db = new DB();
-			db.loadConnect();
+			con = db.loadConnect();
+			list = new ArrayList<UserBean>();
+			
 			request.setCharacterEncoding("EUC-KR");
 			num = Integer.parseInt(request.getParameter("pNum"));
+			db.updateHit(con, num);
 			
-			db.updateHit(num);
-			
-			rs = db.getPostInfo(num);
-			
-			if(rs.next()){
-				title = rs.getString("title");
-				name = rs.getString("name");
-				pdate = rs.getString("pDate");
-				hit = rs.getInt("hit");
-				contents = rs.getString("contents");
-			}
+			list = db.getPostInfo(con, num);
+			title = list.get(0).getTitle();
+			name = list.get(0).getName();
+			pdate = list.get(0).getPdate();
+			hit = list.get(0).getHit();
+			contents = list.get(0).getContents();
 			
 		%>
+		<form name="showPost" id="showPost" action ="Confirm_PW.jsp" method="post">
+		<input type="hidden" id="flag" name="flag" value="" />
+		<input type="hidden" id="pNum" name="pNum" value="<%=num %>" />
 		<br>
 		<hr>
 		<table>
@@ -65,10 +91,11 @@ body {
 			<td width = "1000"><%= contents%></td>
 		</table><br><br><br>
 		<hr>
-		<input type = "button"  value = "추천" name ="recommend" onClick ="window.open('Recom_update.jsp?pNum=<%=num%>','','top=100px, left=100px, height=100px, width=100px')">
-		<input type = "button" value = "수정" name ="modify" onClick = "location.href = 'Confirm_PW.jsp?flag=1&pNum=<%=num%>'">
-		<input type = "button" value = "삭제" name ="delete" onClick = "location.href = 'Confirm_PW.jsp?flag=2&pNum=<%=num%>'">		
+		<input type = "button" value = "추천" name ="recommend" onClick ="window.open('Recom_update.jsp?pNum=<%=num %>','','top=100px, left=100px, height=100px, width=100px')">
+		<input type = "button" value = "수정" name ="modify" onClick = "submit('Confirm_PW.jsp', '<%=num %>', '1');">
+		<input type = "button" value = "삭제" name ="delete" onClick = "submit('Confirm_PW.jsp', '<%=num %>', '2');">		
 		<input type = "button" value = "목록" onClick = "location.href = 'Board.jsp'">
+		</form>
 		<% 
 		}catch (Exception e) {
 			System.out.print("에러");
