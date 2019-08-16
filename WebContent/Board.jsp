@@ -4,7 +4,14 @@
 <%@ page language="java" contentType="text/html; charset=EUC-KR"
     pageEncoding="EUC-KR" import="java.sql.*,board.*"%>
     <%
-   // String lineCount = request.getParameter("lineCount");
+		String test2 = (request.getParameter("firstPaging") == null) ? "1" : request.getParameter("firstPaging");
+    	int firstPaging = Integer.parseInt(test2);
+    	
+    	String test = (request.getParameter("paging") == null) ? "1" : request.getParameter("paging");
+    	int paging = Integer.parseInt(test);
+    	
+    	String test3 = (request.getParameter("lineCount") == null) ? "3" : request.getParameter("lineCount");
+    	int lineCount = Integer.parseInt(test3);
     %>
   <!--    <script>alert("<%//=lineCount %>");</script>-->
 
@@ -14,7 +21,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
 <title>Insert title here</title>
 <script language = "javascript">
-function count(){
+function postCount(){
 	var selId = document.getElementById("count");
 	var idx = selId.selectedIndex;
 	var count = selId.options[idx].value;
@@ -31,6 +38,12 @@ function submit(url, pNum, flag) {
 	document.getElementById("formPost").submit();
 }
 
+function onReload(paging,firstPaging) {
+	document.getElementById("paging").value = paging;
+	document.getElementById("firstPaging").value = firstPaging;
+	document.getElementById("formPost").setAttribute("action", "Board.jsp");
+	document.getElementById("formPost").submit();
+}
 
 </script>
 </head>
@@ -57,9 +70,13 @@ body {
 		String category = null;
 		ResultSet rs = null;
 		ArrayList<UserBean> list = null;
+		PageCount pCount = null;
+		LastPage lastP = null;
 		int num=0, nextNum = 0;
 		int count=0;
 		boolean recommend = false;
+		
+		int postCount=0,first=0,last=0, pageDevide = 0;
 		try{
 			list = new ArrayList<UserBean>();
 			request.setCharacterEncoding("EUC-KR");
@@ -68,6 +85,7 @@ body {
 			list = db.getCategory(con);
 	%>
 	<h3> Board</h3><hr>
+		<form id="formPost" action="Post.jsp" method="post">
 		<select id = "category"> 
 			<option value =""> 게시판 이름 </option>
 			<%
@@ -78,9 +96,9 @@ body {
 			}
 			%>
 		</select>
-		<select id = "count" onchange="count()">
-		
-			<option value ="5" selected>5</option>
+		<select id = "count" onchange="postCount()">
+			<option value ="3">3</option>
+			<option value ="5" >5</option>
 			<option value ="7">7</option>
 			<option value ="10">10</option>
 		</select><br><hr>
@@ -95,16 +113,15 @@ body {
 			</tr>
 		</table><hr>
 		
-		<form id="formPost" action="Post.jsp" method="post">
 		<% nextNum = db.getNextPnum(con); %>
 			<input type="hidden" id="pNum" name="pNum" value="<%=nextNum %>" />
-		<!--<input type="hidden" name="pNum" value="999" /> -->
 			<input type="hidden" id="flag" name="flag" value="4" />
-			<input type="hidden" id="lineCount" name="lineCount" value="" />
+			<input type="hidden" id="lineCount" name="lineCount" value="<%=lineCount %>" />
 			<input type="hidden" value = "<%=recommend %>" name = "recommend">
 		<div>
 			<table class = "notice">
 		<%
+			pageDevide = lineCount;
 			list = db.loadNotice(con);
 			for(int i=0;i<list.size();i++){
 				num = list.get(i).getPnum();
@@ -127,13 +144,30 @@ body {
 		<div>
 			<table class = "post">
 		<%
-			list = db.getPostHeader(con);
+			postCount = db.countPost(con);
+			
+			
+		%>
+			<input type="hidden" id="paging" value = "<%=paging %>" name = "paging"/>
+			<input type="hidden" id="firstPaging" value ="<%=firstPaging %>" name = "firstPaging"/>
+			<script>alert("<%=paging%> / <%=firstPaging%> / <%=lineCount%>")</script>
+		<% 
+				
+			if(postCount>=pageDevide){
+				last = paging * pageDevide;
+				first = last - pageDevide + 1;
+				list = db.getPostHeader(con,first,last);
+			} else {
+				first = 1;
+				last = pageDevide;
+				list = db.getPostHeader(con,first,last);
+			}
 			for(int i=0;i<list.size();i++){
 				String show = list.get(i).getShow();
 				num = list.get(i).getPnum();
-				
-				if(show.equals("N")){
-					%><tr align = "center">
+				if(show.equals("N")||show.equals("null")){
+		%>
+					<tr align = "center">
 					<td width = "70"><%=num%></td>
 					<td width = "600"><a href ="javascript:submit('Confirm_PW.jsp', '<%=num%>', '3');">공개되지 않은 글 입니다.</a></td>
 					<td width = "100"><%=list.get(i).getName()%></td>
@@ -141,7 +175,7 @@ body {
 					<td width = "70"><%=list.get(i).getRecommend()%></td>
 					<td width = "150"><%=list.get(i).getPdate()%></td>
 				</tr>
-				<% 
+		<% 
 				} else {
 			%>	
 				<tr align = "center">
@@ -158,7 +192,64 @@ body {
 			%>	
 			</table>
 		</div><hr>
-		<input type = "submit" value = "글쓰기">
+		<table>
+		<%
+				
+			if(paging%10 == 1 && paging < 2){
+		%>	
+			<td width ="20"> << </td>
+			<td width = "30"> < </td>
+		<%
+			} else if(paging%10 == 1){
+				
+		%>
+			<td width ="20"><a href="javascript:onReload('<%=1 %>','<%=1 %>')"> << </a></td>
+			<td width ="20"><a href="javascript:onReload('<%=paging-1%>','<%=firstPaging-10%>')"> < </a></td>
+		<% } else {
+		
+		%>	
+			<td width ="20"><a href="javascript:onReload('<%=1 %>','<%=1 %>')"> << </a></td>
+			<td width = "30"><a href="javascript:onReload('<%=paging-1%>','<%=firstPaging %>')"> < </a></td>
+		<%
+		}
+			pCount = new PageCount();
+			int pageCount = pCount.paging(postCount, pageDevide);
+		
+			for(int i=firstPaging;i<=pageCount;i++){
+				if(i%10==0) {
+		%>
+			<td width = "15"><a href ="javascript:onReload('<%=i%>','<%=firstPaging%>');"><%=i %></a></td>
+		<% 		
+			break;
+			} else {
+		%>		
+		<td width = "15"><a href ="javascript:onReload('<%=i%>','<%=firstPaging%>');"><%=i %></a></td>
+		<% 
+			}
+		}
+			
+		if(paging%10 == 0){
+			firstPaging = paging+1;	
+		%>
+			<td width ="20"><a href="javascript:onReload('<%=paging+1%>','<%=firstPaging%>')"> > </a></td>
+		<%	
+		} else if(paging >= pageCount){
+		%>
+			<td width ="30"> > </td>
+		<%	
+			} else {
+		%>
+			<td width ="20"><a href="javascript:onReload('<%=paging+1%>','<%=firstPaging%>')"> > </a></td>
+		<%	
+		}
+	
+		lastP = new LastPage();
+		lastP.lastPage(pageCount);
+		%>
+		
+		<td width ="15"><a href="javascript:onReload('<%=pageCount%>','<%=lastP.lastPage(pageCount)%>')"> >> </a></td>
+		<td width ="100"><input type = "submit" value = "글쓰기"></td>
+		</table>
 		</form>
 		
 	<% 	

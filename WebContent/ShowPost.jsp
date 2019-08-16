@@ -19,9 +19,7 @@
 
   		num = Integer.parseInt(request.getParameter("pNum"));
   		recommend  = Boolean.parseBoolean(request.getParameter("recommend"));
-  		%>
-  		<script>alert("<%=recommend%>")</script>
-  		<%
+  		
   		if(recommend){
   		%>
   			<script>alert("추천하였습니다");</script>

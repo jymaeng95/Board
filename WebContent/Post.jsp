@@ -114,11 +114,11 @@ body {
 	비밀번호 :
 	<input type = "password" value = "" name = "pPw" size="10">
 	공개허용 : 
-	<input type = "radio" name = "show" value ="Y"> Y 
+	<input type = "radio" name = "show" value ="Y" checked> Y 
 	<input type = "radio" name = "show" value ="N"> N
 	공지사항 : 
 	<input type = "radio" name = "notice" value ="Y"> Y 
-	<input type = "radio" name = "notice" value ="N"> N 
+	<input type = "radio" name = "notice" value ="N" checked> N 
 	 
 	<br> <hr>
 	<input type ="text" value ="" name = "title" size ="100">

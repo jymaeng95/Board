@@ -119,6 +119,29 @@ public class DB {
 		return list;
 	}
 
+	public int countPost(Connection con) {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		int postCount=0;
+		
+		String sql = "select count(pNum) from post";
+		
+		try {
+			pstmt = con.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				postCount = rs.getInt(1);
+			}
+			return postCount;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			closeRs(rs);
+			closePstmt(pstmt);
+		}
+		return postCount;
+	}
+	
 	//포스트 불러오기 
 	public ArrayList getPostHeader(Connection con) {
 		PreparedStatement pstmt = null;
@@ -151,6 +174,44 @@ public class DB {
 		}
 		return list;
 	}
+	
+	public ArrayList getPostHeader(Connection con,int first, int last) {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		ArrayList<UserBean> list = new ArrayList<UserBean>();
+		StringBuilder sql = new StringBuilder();
+		sql.append("select show_YN, pNum, title, name, hit, recommend, pdate ");
+		sql.append("from ( select A.*, rownum as rnum from ");
+		sql.append("( select show_YN, pNum, title, name, hit, recommend, pdate ");
+		sql.append("from post order by pNum desc ) A ");
+		sql.append("where rownum <= ? ) where rnum >= ?");
+		
+		try {	
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setInt(1, last);
+			pstmt.setInt(2, first);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				UserBean bean = new UserBean();
+				bean.setShow(rs.getString("show_YN"));
+				bean.setPnum(rs.getInt("pNum"));
+				bean.setTitle(rs.getString("title"));
+				bean.setName(rs.getString("name"));
+				bean.setHit(rs.getInt("hit"));
+				bean.setRecommend(rs.getInt("recommend"));
+				bean.setPdate(rs.getString("pdate"));
+				list.add(bean);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			closeRs(rs);
+			closePstmt(pstmt);
+		}
+		return list;
+	}
+	
 
 	public int getNextPnum(Connection con) {
 		PreparedStatement pstmt = null;
