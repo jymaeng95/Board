@@ -9,4 +9,12 @@ public class CommonUtil {
 		}
 		return str;
 	}
+	
+	public static String defaultString(String str, String defaultStr) {
+		if (str == null || "".equals(str)) {
+			str = defaultStr;
+		}
+		
+		return str;
+	}
 }
