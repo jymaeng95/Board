@@ -23,12 +23,10 @@ $(function() {
 	});
 	
 	$('.SecretTitle').css("cursor","pointer");
-	$('.SecretTitle').on('click',function(event) {
-		
-		alert($(event.currentTarget).contents('div').attr("test"));
-		
-		
+	$('.SecretClass').one('click',function(event) {
+		$(event.currentTarget).find('.hidePw').toggle();
 	});
+
 	
 	$('#clickPw').on('click',function(){
 		var postNum = $('.SecretTitle').attr("num");
@@ -47,7 +45,7 @@ $(function() {
 				if(data.check == "1"){
 					onSubmit("ShowPost.jsp",postNum,"");
 				} else {
-					alert("비밀번호가 틀렸습니다.")
+					alert("비밀번호가 틀렸습니다.");
 				}
 			},
 			error : function() {
@@ -55,8 +53,6 @@ $(function() {
 			}
 		});
 	});
-	
-	
 	
 	$('#count').on('change', function() {
 		var count = $('#count option:selected').val();
@@ -209,7 +205,7 @@ body {
 				<tr align = "center">
 					<td width = "70"><%=num%></td>
 					<% if(show.equals("N")||show.equals("null")){ %>
-					<td width = "600"><span class="SecretTitle" num="<%=num%>">공개되지 않은 글 입니다.<br></span>
+					<td class = "SecretClass" width = "600"><span class="SecretTitle" num="<%=num%>">공개되지 않은 글 입니다.<br></span>
 						<div class = "hidePw" test = "123" style ="display:none">
 							<p>비밀번호 :
 							<input type = "password" id = "pPw" name = "pPw" > 
