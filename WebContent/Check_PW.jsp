@@ -14,9 +14,13 @@
 			request.setCharacterEncoding("EUC-KR");
 			
 			num = Integer.parseInt(request.getParameter("pNum"));
-/* 			flag = Integer.parseInt(request.getParameter("flag")); */
+ 			flag = Integer.parseInt(request.getParameter("flag")); 
 			pw = request.getParameter("pPw");
 			check = db.confirmPW(con,num,pw);
+			
+			if(check>0 && flag == 2){
+				db.deletePost(con, num);
+			}
 			
 			String result = "{\"check\":\""+check+"\"}";
 			out.print(result);

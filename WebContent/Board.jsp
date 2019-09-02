@@ -31,13 +31,15 @@ $(function() {
 	$('#clickPw').on('click',function(){
 		var postNum = $('.SecretTitle').attr("num");
 		var postPw = $('#pPw').val();
+		var postFlag = $('#flag').val();
 		$.ajax({
 			type : "post",
 			async : false,
 			url : "Check_PW.jsp",
 			data : {
 				"pNum" : postNum,
-				"pPw" : postPw
+				"pPw" : postPw,
+				"flag" : postFlag
 			},
 			dataType : "json",
 			success : function(data) {
